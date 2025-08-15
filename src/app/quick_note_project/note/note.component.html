@@ -1,0 +1,108 @@
+<div class="bg-gray-100 m-4 mb-2 flex flex-col grow dark:bg-slate-900">
+  
+    <div class="grid grid-cols-4 gap-2 grow">
+        <div class="flex justify-between col-span-4 items-center gap-4 bg-slate-300 dark:bg-slate-700 p-4 shadow rounded">
+                 <h1 class="font-semibold text-slate-900 dark:text-slate-100 text-2xl flex items-center gap-3"> 
+                   <span><i class="fa fa-pencil-square-o fa-2x" aria-hidden="true"></i></span> Quick Notes</h1>      
+             
+                <div class="flex gap-2 items-center">
+                    <button
+                        class="px-4 py-2 border border-blue-700 bg-blue-700 text-white font-medium rounded hover:bg-blue-600 hover:text-white w-56"
+                        (click)="addNote()">
+                        Add Note
+                    </button>
+                
+                    <div>
+                         <button (click)="changeTheme()" class="p-2 w-12 h-12 rounded-full bg-slate-800 dark:bg-slate-300">
+                        <i class="fa fa-sun-o text-slate-900 fa-2x" aria-hidden="true" *ngIf="isDark"></i>
+                        <i class="fa fa-moon-o text-white fa-2x" aria-hidden="true" *ngIf="!isDark"></i>
+                    </button>
+                    </div>
+                   
+                </div>
+                
+            </div>
+
+            <div class="flex flex-col grow bg-white dark:bg-slate-800 shadow rounded p-2">
+                <input type="text" placeholder="Search notes..." class="p-2 border rounded dark:bg-slate-700 dark:border-slate-700 dark:text-slate-200" [(ngModel)]="inputValue"
+                    (input)="searchNoteList(inputValue)" />
+            
+                <ul class="max-h-[100px] overflow-auto min-h-[760px] mt-2">
+                    <li *ngFor="let note of notes" class="p-2 border-b dark:border-slate-500 hover:bg-gray-50 dark:hover:bg-slate-700 cursor-pointer" (click)="selectNote(note)">
+                        <div class="p-2">
+                            <span class="text-sm text-gray-500 dark:text-slate-400">{{note.date | date: 'short'}}</span>
+                            <h3 class="font-semibold dark:text-slate-100">{{note.noteTitle}}</h3>
+                            <p class="text-gray-600 dark:text-slate-300 truncate max-w-96 min-w-10">{{note.noteContent}}</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+        <div class="col-span-3 flex flex-col grow">
+            <div class="p-4 bg-white dark:bg-slate-800 shadow rounded grow flex flex-col">
+                <div *ngIf="isNewNote" class="flex flex-col grow gap-2">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-lg font-semibold dark:text-slate-200">New Note</h3>
+                        <div class="flex gap-2">
+                            <button *ngIf="!isUpdate" class="px-4 py-2 border border-blue-300 bg-blue-200 dark:bg-blue-500/80 dark:text-white dark:border-blue-500 text-blue-700 rounded font-medium hover:bg-blue-700 hover:text-white w-40" (click)="saveNote()">
+                                Save Note
+                            </button>
+                            <button *ngIf="isUpdate" class="px-4 py-2 border border-blue-300 bg-blue-200 dark:bg-blue-500/80 dark:text-white dark:border-blue-500 text-blue-700 rounded font-medium hover:bg-blue-700 hover:text-white w-40" (click)="saveNote()">
+                                Update Note
+                            </button>
+                            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-400 text-gray-700 dark:text-gray-900 rounded hover:bg-gray-200 w-40" (click)="isNewNote = false">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                
+                    <div class="flex flex-col gap-3 grow bg-slate-100 dark:bg-slate-700/30 p-4 rounded-lg">
+                        <form [formGroup]="notesForm" class="flex flex-col grow gap-3">
+                            <div class="flex flex-col gap-1">
+                                <h5 class="text-lg text-slate-800 dark:text-slate-300 font-normal">Title:</h5>
+                                <input type="text" placeholder="Enter note title" class="p-2 border rounded border-slate-400 dark:bg-slate-700/20 dark:border-slate-500/50 dark:text-slate-200"
+                                    formControlName="noteTitle" />
+                            </div>
+                            <div class="flex flex-col gap-1 grow">
+                                <h5 class="text-lg text-slate-800 font-normal dark:text-slate-300">Description:</h5>
+                                <textarea placeholder="Enter note description" class="p-2 border rounded h-32 grow border-slate-400 dark:bg-slate-700/20 dark:border-slate-500/50 dark:text-slate-200"
+                                    formControlName="noteContent"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div *ngIf="!isNewNote && selectedNotedData"  class="flex flex-col grow gap-2 divide-y divide-slate-400 dark:divide-slate-600">
+                     <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-lg font-semibold dark:text-slate-200">{{selectedNotedData?.noteTitle}}</h3>
+                        <div class="flex gap-2">
+                            <button class="px-4 py-2 border border-blue-300 bg-blue-200 text-blue-700 dark:bg-blue-500/80 dark:text-white rounded font-medium dark:border-blue-500 hover:bg-blue-700 hover:text-white w-40" (click)="editNote()">
+                                Edit Note
+                            </button>
+                            <button class="px-4 py-2 bg-red-300 text-red-700 rounded hover:bg-red-500 hover:text-white w-40" (click)="deleteNote()">
+                                Delete Note
+                            </button>
+                        </div>
+                       
+                    </div>
+                    <div class="flex flex-col gap-3 grow p-4">
+                          <p class="text-slate-600 dark:text-slate-200">{{selectedNotedData?.noteContent}}</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col grow gap-2 border-2 rounded-lg border-dashed border-slate-400 dark:border-slate-600" *ngIf="!isNewNote && !selectedNotedData">
+                    <div class="flex justify-center items-center grow flex-col gap-4">
+                        <h3 class="text-slate-500 text-xl dark:text-slate-300">Select/Add a note to view details</h3>
+                        <button
+                            class="px-4 py-2 border border-blue-700 bg-blue-700 text-white font-medium rounded hover:bg-blue-700 hover:text-white w-72"
+                            (click)="addNote()">
+                            Add Note
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>
